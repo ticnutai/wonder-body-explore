@@ -10,8 +10,10 @@ const HeroSection = ({ onStart }: { onStart: () => void }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
     className="flex flex-col items-center justify-center min-h-screen bg-grid relative overflow-hidden"
   >
+    {/* Glow effects */}
     <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
     <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
 
@@ -32,7 +34,7 @@ const HeroSection = ({ onStart }: { onStart: () => void }) => (
         פלאי גוף האדם
       </h1>
       <p className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto">
-        גלו את הסודות המדהימים של גוף האדם בחוויה אינטראקטיבית
+        גלו את הסודות המדהימים של גוף האדם בחוויה אינטראקטיבית תלת-מימדית
       </p>
       <button
         onClick={onStart}
@@ -50,8 +52,8 @@ const ExplorerView = () => {
   return (
     <div className="relative w-full h-screen bg-background overflow-hidden">
       {/* Top bar */}
-      <div className="absolute top-0 right-0 left-0 z-10 flex items-center justify-between p-3 px-5 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <h2 className="text-lg font-black text-foreground">🧬 פלאי גוף האדם</h2>
+      <div className="absolute top-0 right-0 left-0 z-10 flex items-center justify-between p-4 bg-background/80 backdrop-blur-md border-b border-border">
+        <h2 className="text-lg font-bold text-foreground">🧬 פלאי גוף האדם</h2>
         <LevelSelector />
       </div>
 
@@ -60,16 +62,16 @@ const ExplorerView = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-center"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-center"
         >
-          <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-md px-6 py-3 rounded-full border border-border/50 shadow-lg">
-            👆 העבירו את העכבר על האיברים ולחצו כדי ללמוד עליהם
+          <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-md px-6 py-3 rounded-full border border-border">
+            👆 לחצו על איבר בגוף כדי ללמוד עליו • גררו כדי לסובב
           </p>
         </motion.div>
       )}
 
-      {/* Body model - centered */}
-      <div className="w-full h-full pt-14 flex items-center justify-center">
+      {/* 3D Canvas */}
+      <div className="w-full h-full">
         <HumanBodyModel
           onSelectOrgan={setSelectedOrgan}
           selectedOrgan={selectedOrgan}
