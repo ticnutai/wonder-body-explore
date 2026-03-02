@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { LevelProvider } from '@/contexts/LevelContext';
 import LevelSelector from '@/components/LevelSelector';
-import HumanBodyModel from '@/components/HumanBodyModel';
+import HumanBody3D from '@/components/HumanBody3D';
 import OrganInfoPanel from '@/components/OrganInfoPanel';
 import { OrganInfo } from '@/data/organs';
 
@@ -70,7 +70,7 @@ const ExplorerView = () => {
 
       {/* Body model - centered */}
       <div className="w-full h-full pt-14 flex items-center justify-center">
-        <HumanBodyModel
+        <HumanBody3D
           onSelectOrgan={setSelectedOrgan}
           selectedOrgan={selectedOrgan}
         />
