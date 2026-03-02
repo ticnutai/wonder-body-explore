@@ -10,10 +10,8 @@ const HeroSection = ({ onStart }: { onStart: () => void }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
     className="flex flex-col items-center justify-center min-h-screen bg-grid relative overflow-hidden"
   >
-    {/* Glow effects */}
     <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
     <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
 
@@ -34,7 +32,7 @@ const HeroSection = ({ onStart }: { onStart: () => void }) => (
         פלאי גוף האדם
       </h1>
       <p className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto">
-        גלו את הסודות המדהימים של גוף האדם בחוויה אינטראקטיבית תלת-מימדית
+        גלו את הסודות המדהימים של גוף האדם בחוויה אינטראקטיבית
       </p>
       <button
         onClick={onStart}
@@ -65,13 +63,13 @@ const ExplorerView = () => {
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-center"
         >
           <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-md px-6 py-3 rounded-full border border-border">
-            👆 לחצו על איבר בגוף כדי ללמוד עליו • גררו כדי לסובב
+            👆 לחצו על איבר בגוף כדי ללמוד עליו
           </p>
         </motion.div>
       )}
 
-      {/* 3D Canvas */}
-      <div className="w-full h-full">
+      {/* Body model */}
+      <div className="w-full h-full pt-16">
         <HumanBodyModel
           onSelectOrgan={setSelectedOrgan}
           selectedOrgan={selectedOrgan}
