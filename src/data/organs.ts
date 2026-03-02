@@ -8,6 +8,7 @@ export interface OrganInfo {
   scale: [number, number, number];
   color: string;
   hoverColor: string;
+  image: string;
   kids: {
     description: string;
     funFact: string;
