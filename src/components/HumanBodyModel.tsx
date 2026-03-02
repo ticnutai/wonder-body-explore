@@ -1,172 +1,134 @@
-import { useRef, useState, useCallback } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Sphere } from '@react-three/drei';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { OrganInfo, organs } from '@/data/organs';
-import * as THREE from 'three';
-
-interface OrganMeshProps {
-  organ: OrganInfo;
-  onSelect: (organ: OrganInfo) => void;
-  isSelected: boolean;
-}
-
-const OrganMesh = ({ organ, onSelect, isSelected }: OrganMeshProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [hovered, setHovered] = useState(false);
-
-  useFrame((_, delta) => {
-    if (!meshRef.current) return;
-    const material = meshRef.current.material as THREE.MeshStandardMaterial;
-    const targetEmissive = hovered || isSelected ? 0.6 : 0;
-    material.emissiveIntensity = THREE.MathUtils.lerp(
-      material.emissiveIntensity,
-      targetEmissive,
-      delta * 5
-    );
-    const targetScale = hovered ? 1.1 : 1;
-    meshRef.current.scale.lerp(
-      new THREE.Vector3(
-        organ.scale[0] * targetScale,
-        organ.scale[1] * targetScale,
-        organ.scale[2] * targetScale
-      ),
-      delta * 5
-    );
-  });
-
-  return (
-    <mesh
-      ref={meshRef}
-      position={organ.position}
-      scale={organ.scale}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(organ);
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        setHovered(true);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        setHovered(false);
-        document.body.style.cursor = 'default';
-      }}
-    >
-      <sphereGeometry args={[1, 24, 24]} />
-      <meshStandardMaterial
-        color={hovered || isSelected ? organ.hoverColor : organ.color}
-        emissive={organ.color}
-        emissiveIntensity={0}
-        transparent
-        opacity={hovered || isSelected ? 0.95 : 0.7}
-        roughness={0.3}
-        metalness={0.1}
-      />
-    </mesh>
-  );
-};
-
-const BodyOutline = () => {
-  const points = [
-    // Head
-    new THREE.Vector3(0, 3.3, 0),
-    // Neck
-    new THREE.Vector3(0, 2.2, 0),
-    // Shoulders
-    new THREE.Vector3(-0.8, 2.0, 0),
-    new THREE.Vector3(0.8, 2.0, 0),
-    // Torso
-    new THREE.Vector3(-0.5, 0.3, 0),
-    new THREE.Vector3(0.5, 0.3, 0),
-    // Hips
-    new THREE.Vector3(-0.45, 0.0, 0),
-    new THREE.Vector3(0.45, 0.0, 0),
-  ];
-
-  return (
-    <group>
-      {/* Head circle */}
-      <mesh position={[0, 2.8, 0]}>
-        <sphereGeometry args={[0.55, 32, 32]} />
-        <meshStandardMaterial
-          color="#1a3a5c"
-          transparent
-          opacity={0.15}
-          roughness={0.8}
-          wireframe
-        />
-      </mesh>
-      {/* Torso */}
-      <mesh position={[0, 1.15, 0]}>
-        <cylinderGeometry args={[0.55, 0.45, 2.2, 16, 1, true]} />
-        <meshStandardMaterial
-          color="#1a3a5c"
-          transparent
-          opacity={0.12}
-          roughness={0.8}
-          wireframe
-        />
-      </mesh>
-      {/* Left arm */}
-      <mesh position={[-0.95, 1.2, 0]} rotation={[0, 0, 0.2]}>
-        <cylinderGeometry args={[0.12, 0.1, 1.8, 8, 1, true]} />
-        <meshStandardMaterial color="#1a3a5c" transparent opacity={0.1} wireframe />
-      </mesh>
-      {/* Right arm */}
-      <mesh position={[0.95, 1.2, 0]} rotation={[0, 0, -0.2]}>
-        <cylinderGeometry args={[0.12, 0.1, 1.8, 8, 1, true]} />
-        <meshStandardMaterial color="#1a3a5c" transparent opacity={0.1} wireframe />
-      </mesh>
-      {/* Left leg */}
-      <mesh position={[-0.25, -1.2, 0]}>
-        <cylinderGeometry args={[0.18, 0.12, 2.2, 8, 1, true]} />
-        <meshStandardMaterial color="#1a3a5c" transparent opacity={0.1} wireframe />
-      </mesh>
-      {/* Right leg */}
-      <mesh position={[0.25, -1.2, 0]}>
-        <cylinderGeometry args={[0.18, 0.12, 2.2, 8, 1, true]} />
-        <meshStandardMaterial color="#1a3a5c" transparent opacity={0.1} wireframe />
-      </mesh>
-    </group>
-  );
-};
 
 interface HumanBodyModelProps {
   onSelectOrgan: (organ: OrganInfo) => void;
   selectedOrgan: OrganInfo | null;
 }
 
+const organPositions: Record<string, { cx: number; cy: number; rx: number; ry: number; label: { x: number; y: number } }> = {
+  brain:   { cx: 200, cy: 60,  rx: 35, ry: 30, label: { x: 200, y: 60 } },
+  eyes:    { cx: 200, cy: 95,  rx: 28, ry: 8,  label: { x: 200, y: 95 } },
+  ears:    { cx: 200, cy: 75,  rx: 45, ry: 10, label: { x: 200, y: 75 } },
+  heart:   { cx: 210, cy: 200, rx: 20, ry: 22, label: { x: 210, y: 200 } },
+  lungs:   { cx: 200, cy: 210, rx: 45, ry: 35, label: { x: 200, y: 210 } },
+  stomach: { cx: 195, cy: 275, rx: 25, ry: 22, label: { x: 195, y: 275 } },
+  hands:   { cx: 200, cy: 330, rx: 80, ry: 15, label: { x: 200, y: 330 } },
+  legs:    { cx: 200, cy: 450, rx: 35, ry: 70, label: { x: 200, y: 450 } },
+};
+
 const HumanBodyModel = ({ onSelectOrgan, selectedOrgan }: HumanBodyModelProps) => {
+  const [hoveredOrgan, setHoveredOrgan] = useState<string | null>(null);
+
   return (
-    <Canvas
-      camera={{ position: [0, 1, 6], fov: 50 }}
-      style={{ width: '100%', height: '100%' }}
-    >
-      <ambientLight intensity={0.4} />
-      <pointLight position={[5, 5, 5]} intensity={0.8} color="#4fc3f7" />
-      <pointLight position={[-5, 3, 3]} intensity={0.5} color="#80cbc4" />
-      <pointLight position={[0, -3, 5]} intensity={0.3} color="#ce93d8" />
+    <div className="flex items-center justify-center w-full h-full">
+      <svg viewBox="0 0 400 550" className="w-full max-w-[500px] h-auto" style={{ maxHeight: 'calc(100vh - 150px)' }}>
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="glow-strong">
+            <feGaussianBlur stdDeviation="8" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="bodyGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#1e3a5f" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#0d1b2a" stopOpacity="0.8" />
+          </linearGradient>
+          <radialGradient id="organGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#4fc3f7" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#4fc3f7" stopOpacity="0" />
+          </radialGradient>
+        </defs>
 
-      <BodyOutline />
+        {/* Body silhouette */}
+        <g opacity="0.5">
+          {/* Head */}
+          <ellipse cx="200" cy="55" rx="40" ry="45" fill="url(#bodyGradient)" stroke="#2a5a8a" strokeWidth="1.5" />
+          {/* Neck */}
+          <rect x="188" y="95" width="24" height="25" rx="8" fill="url(#bodyGradient)" stroke="#2a5a8a" strokeWidth="1" />
+          {/* Torso */}
+          <path d="M140 120 Q140 115 160 115 L240 115 Q260 115 260 120 L270 170 L270 300 Q270 320 250 320 L150 320 Q130 320 130 300 L130 170 Z"
+            fill="url(#bodyGradient)" stroke="#2a5a8a" strokeWidth="1.5" />
+          {/* Left Arm */}
+          <path d="M140 125 L110 130 Q95 135 90 160 L80 260 Q78 275 85 280 L95 282 Q102 280 104 270 L120 170 L130 145"
+            fill="url(#bodyGradient)" stroke="#2a5a8a" strokeWidth="1.5" />
+          {/* Right Arm */}
+          <path d="M260 125 L290 130 Q305 135 310 160 L320 260 Q322 275 315 280 L305 282 Q298 280 296 270 L280 170 L270 145"
+            fill="url(#bodyGradient)" stroke="#2a5a8a" strokeWidth="1.5" />
+          {/* Left Leg */}
+          <path d="M150 318 L148 320 L140 400 L135 480 Q133 500 145 505 L155 505 Q165 500 163 490 L170 400 L180 325"
+            fill="url(#bodyGradient)" stroke="#2a5a8a" strokeWidth="1.5" />
+          {/* Right Leg */}
+          <path d="M250 318 L252 320 L260 400 L265 480 Q267 500 255 505 L245 505 Q235 500 237 490 L230 400 L220 325"
+            fill="url(#bodyGradient)" stroke="#2a5a8a" strokeWidth="1.5" />
+        </g>
 
-      {organs.map((organ) => (
-        <OrganMesh
-          key={organ.id}
-          organ={organ}
-          onSelect={onSelectOrgan}
-          isSelected={selectedOrgan?.id === organ.id}
-        />
-      ))}
+        {/* Clickable organs */}
+        {organs.map((organ) => {
+          const pos = organPositions[organ.id];
+          if (!pos) return null;
+          const isHovered = hoveredOrgan === organ.id;
+          const isSelected = selectedOrgan?.id === organ.id;
+          const active = isHovered || isSelected;
 
-      <OrbitControls
-        enablePan={false}
-        minDistance={3}
-        maxDistance={10}
-        autoRotate
-        autoRotateSpeed={0.5}
-      />
-    </Canvas>
+          return (
+            <g
+              key={organ.id}
+              onClick={() => onSelectOrgan(organ)}
+              onMouseEnter={() => setHoveredOrgan(organ.id)}
+              onMouseLeave={() => setHoveredOrgan(null)}
+              style={{ cursor: 'pointer' }}
+            >
+              {/* Glow background */}
+              {active && (
+                <ellipse
+                  cx={pos.cx}
+                  cy={pos.cy}
+                  rx={pos.rx + 12}
+                  ry={pos.ry + 12}
+                  fill={organ.color}
+                  opacity={0.15}
+                  filter="url(#glow-strong)"
+                />
+              )}
+              {/* Organ shape */}
+              <ellipse
+                cx={pos.cx}
+                cy={pos.cy}
+                rx={active ? pos.rx + 3 : pos.rx}
+                ry={active ? pos.ry + 3 : pos.ry}
+                fill={active ? organ.hoverColor : organ.color}
+                opacity={active ? 0.9 : 0.6}
+                filter={active ? 'url(#glow)' : undefined}
+                style={{ transition: 'all 0.3s ease' }}
+              />
+              {/* Label */}
+              <text
+                x={pos.label.x}
+                y={pos.label.y + (pos.ry + 20)}
+                textAnchor="middle"
+                fill={active ? '#ffffff' : '#8899aa'}
+                fontSize="12"
+                fontFamily="Rubik, sans-serif"
+                fontWeight={active ? '600' : '400'}
+                style={{ transition: 'all 0.3s ease', pointerEvents: 'none' }}
+              >
+                {organ.emoji} {organ.name}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
   );
 };
 
