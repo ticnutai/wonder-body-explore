@@ -1,4 +1,5 @@
 import { OrganInfo } from '@/data/organs';
+import { organImages } from '@/data/organImages';
 import { useLevel } from '@/contexts/LevelContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Lightbulb, BookOpen, FlaskConical, Play } from 'lucide-react';
@@ -27,7 +28,7 @@ const OrganInfoPanel = ({ organ, onClose }: OrganInfoPanelProps) => {
           
           <div className="p-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-4">
               <motion.div 
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -54,6 +55,23 @@ const OrganInfoPanel = ({ organ, onClose }: OrganInfoPanelProps) => {
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* Realistic organ image */}
+            {organImages[organ.id] && (
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.15 }}
+                className="mb-5 rounded-2xl overflow-hidden border border-border/30 shadow-xl"
+                style={{ background: `linear-gradient(135deg, ${organ.color}15, ${organ.hoverColor}10)` }}
+              >
+                <img
+                  src={organImages[organ.id]}
+                  alt={organ.name}
+                  className="w-full h-48 object-contain p-2"
+                />
+              </motion.div>
+            )}
 
             {/* Description */}
             <motion.div 
