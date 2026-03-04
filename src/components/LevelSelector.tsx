@@ -1,8 +1,9 @@
 import { useLevel } from '@/contexts/LevelContext';
-import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const LevelSelector = () => {
   const { level, setLevel } = useLevel();
+  const { t } = useLanguage();
 
   return (
     <div className="flex items-center gap-3">
@@ -15,7 +16,7 @@ const LevelSelector = () => {
         }`}
       >
         <span>🧒</span>
-        <span>ילדים</span>
+        <span>{t('level.kids')}</span>
       </button>
       <button
         onClick={() => setLevel('adults')}
@@ -26,7 +27,7 @@ const LevelSelector = () => {
         }`}
       >
         <span>🧑</span>
-        <span>מבוגרים</span>
+        <span>{t('level.adults')}</span>
       </button>
     </div>
   );

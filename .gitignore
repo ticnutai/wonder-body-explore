@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Large binary/3D model files
+*.zip
+*.glb
+*.fbx
+*.gltf
+f1d17af912d94c6cbc4fd7eb2cb9b3fc/
+human-models-set-malefemale-rigged*/
+public/models/*.glb
